@@ -1,30 +1,59 @@
+// Importa as funções do modelo de dados para interagir com o banco de dados
 import {getTodosPosts , criarPost} from "../models/postsModel.js";
+// Importa o módulo fs (file system) para manipulação de arquivos no sistema operacional
+import fs from "fs";
 
+// Define uma função assíncrona para listar todos os posts
 export async function listarPosts(req, res) {
-    // Chama a função para buscar todos os posts do banco de dados
+    // Obtém todos os posts do banco de dados
     const posts = await getTodosPosts();
-    // Envia uma resposta HTTP com status 200 (OK) e retorna os posts como resposta em formato JSON
+    // Retorna os posts como uma resposta em JSON com o status 200 (OK)
     res.status(200).json(posts);
-    }
+}
 
+// Define uma função assíncrona para criar um novo post
 export async function postarNovoPost(req, res) {
+    // Captura os dados do novo post enviados no corpo da requisição
     const novoPost = req.body;
+
     try {
+        // Chama a função para criar o post no banco de dados
         const postCriado = await criarPost(novoPost);
+        // Retorna o post criado como uma resposta em JSON com o status 200 (OK)
         res.status(200).json(postCriado);
-    } catch(erro) {
+    } catch (erro) {
+        // Exibe o erro no console, caso ocorra
         console.error(erro.message);
-        res.status(500).json({"Erro":"Falha na requisição"})
+        // Retorna uma resposta de erro com status 500 (Erro interno do servidor)
+        res.status(500).json({ "Erro": "Falha na requisição" });
     }
 }
 
+// Define uma função assíncrona para realizar o upload de uma imagem
 export async function uploadImagem(req, res) {
-    const novoPost = req.body;
+    // Cria um objeto para representar o novo post com informações básicas da imagem
+    const novoPost = {
+        descricao: "",
+        imgUrl: req.file.originalname, // Nome do arquivo enviado
+        alt: "" // Texto alternativo vazio, pode ser preenchido posteriormente
+    };
+
     try {
+        // Salva o novo post no banco de dados
         const postCriado = await criarPost(novoPost);
+
+        // Gera um novo caminho para renomear a imagem com o ID do post
+        const imagemAtualizada = `uploads/${postCriado.insertedId}.png`;
+
+        // Renomeia o arquivo enviado para o novo caminho
+        fs.renameSync(req.file.path, imagemAtualizada);
+
+        // Retorna o post criado como uma resposta em JSON com status 200 (OK)
         res.status(200).json(postCriado);
-    } catch(erro) {
+    } catch (erro) {
+        // Exibe o erro no console, caso ocorra
         console.error(erro.message);
-        res.status(500).json({"Erro":"Falha na requisição"})
+        // Retorna uma resposta de erro com status 500 (Erro interno do servidor)
+        res.status(500).json({ "Erro": "Falha na requisição" });
     }
 }

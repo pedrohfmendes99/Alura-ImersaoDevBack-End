@@ -16,8 +16,14 @@ const conexao = await conectarAoBanco(process.env.STRING_CONEXAO);
     return colecao.find().toArray();
 }
 
+// Exporta uma função assíncrona chamada `criarPost` que recebe um objeto `novoPost` para ser inserido no banco de dados
 export async function criarPost(novoPost) {
+        // Obtém a conexão com o banco de dados chamado "imersao-instalike"
         const db = conexao.db("imersao-instalike");
+    
+        // Obtém uma referência à coleção "posts" dentro do banco de dados
         const colecao = db.collection("posts");
-        return colecao.insertOne(novoPost)
-}
+    
+        // Insere o objeto `novoPost` na coleção "posts" e retorna o resultado da operação
+        return colecao.insertOne(novoPost);
+    }
