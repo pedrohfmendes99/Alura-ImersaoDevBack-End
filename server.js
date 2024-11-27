@@ -25,6 +25,9 @@ import routes from "./src/routes/postsRoutes.js";
 // Cria uma aplicação Express
 const app = express();
 
+// Inserir comentário
+app.use(express.static("uploads"))
+
 // Registra as rotas na aplicação para que possam ser acessadas
 routes(app);
 
